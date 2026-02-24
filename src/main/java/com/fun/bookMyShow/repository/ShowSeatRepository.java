@@ -6,11 +6,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 @Repository
-public interface ShowSeatRepository extends JpaRepository<ShowSeat,Integer> {
+public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
 
-    List<ShowSeat> findByShowId(Long movieId);
+    List<ShowSeat> findByShowId(Long showId);
 
-    List<ShowSeat> findByShowIdAndStatus(Long seatI,String status);
+    List<ShowSeat> findByShowIdAndStatusIgnoreCase(Long showId, String status);
+
+    List<ShowSeat> findByShowIdAndIdIn(Long showId, List<Long> ids);
+
+    List<ShowSeat> findByShowIdAndSeatIdIn(Long showId, List<Long> seatIds);
 
 
 }

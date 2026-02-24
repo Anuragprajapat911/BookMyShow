@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,17 +39,67 @@ public class BookingService {
         User user=userRepository.findById(bookingRequest.getUserId())
                 .orElseThrow(()->new ResourceNotFoundException("User not found"));
 
-        Show show=showRepository.findById(bookingRequest.getUserId())
+        Show show=showRepository.findById(bookingRequest.getShowId())
                 .orElseThrow(()->new ResourceNotFoundException("Show not found"));
 
+        List<ShowSeat> existingShowSeats = seatRepository.findByShowId(bookingRequest.getShowId());
+        if (existingShowSeats.isEmpty() && show.getScreen() != null && show.getScreen().getSeats() != null) {
+            List<ShowSeat> generatedSeats = new ArrayList<>();
+            for (Seat seat : show.getScreen().getSeats()) {
+                ShowSeat showSeat = new ShowSeat();
+                showSeat.setShow(show);
+                showSeat.setSeat(seat);
+                showSeat.setStatus("AVAILABLE");
+                showSeat.setPrice(seat.getBasePrice() != null ? seat.getBasePrice().doubleValue() : 0.0);
+                generatedSeats.add(showSeat);
+            }
+            seatRepository.saveAll(generatedSeats);
+        }
 
-        List<ShowSeat> SelectedSeat=seatRepository.findByShowId(bookingRequest.getShowId());
+
+        List<ShowSeat> SelectedSeat;
+        if (bookingRequest.getSeatIds() == null || bookingRequest.getSeatIds().isEmpty()) {
+            SelectedSeat = seatRepository.findByShowIdAndStatusIgnoreCase(bookingRequest.getShowId(), "AVAILABLE")
+                    .stream()
+                    .limit(1)
+                    .collect(Collectors.toList());
+        } else {
+            SelectedSeat = seatRepository.findByShowIdAndIdIn(
+                    bookingRequest.getShowId(),
+                    bookingRequest.getSeatIds()
+            );
+            if (SelectedSeat.isEmpty()) {
+                // Fallback: some clients may send base Seat IDs instead of ShowSeat IDs.
+                SelectedSeat = seatRepository.findByShowIdAndSeatIdIn(
+                        bookingRequest.getShowId(),
+                        bookingRequest.getSeatIds()
+                );
+            }
+        }
+
+        if (SelectedSeat.isEmpty()) {
+            throw new SeatUnavilableExcepation("No available seats for this show");
+        }
+
+        if (bookingRequest.getSeatIds() != null && !bookingRequest.getSeatIds().isEmpty()
+                && SelectedSeat.size() != bookingRequest.getSeatIds().size()) {
+            throw new SeatUnavilableExcepation("Some selected seats are invalid for this show");
+        }
 
         for(ShowSeat showSeat:SelectedSeat)
         {
-            if(!"AVAILABLE".equals(showSeat.getStatus()))
+            String currentStatus = showSeat.getStatus() == null ? "" : showSeat.getStatus().trim().toUpperCase();
+
+            // Recovery path: if a seat was left LOCKED without an associated booking, treat it as AVAILABLE.
+            if ("LOCKED".equals(currentStatus) && showSeat.getBooking() == null) {
+                currentStatus = "AVAILABLE";
+            }
+
+            if(!"AVAILABLE".equals(currentStatus))
             {
-             throw new SeatUnavilableExcepation("seat"+showSeat.getSeat().getSeatNumber()+"is not available");
+             throw new SeatUnavilableExcepation(
+                     "Seat " + showSeat.getSeat().getSeatNumber() + " is not available (status: " + showSeat.getStatus() + ")"
+             );
             }
             showSeat.setStatus("LOCKED");
         }
@@ -68,7 +119,7 @@ public class BookingService {
         booking.setUser(user);
         booking.setShow(show);
         booking.setBookingTime(LocalDateTime.now());
-        booking.setStatus("Conformed");
+        booking.setStatus("CONFIRMED");
         booking.setTotalAmount(totalAmount);
         booking.setBookingNumber(UUID.randomUUID().toString());
         booking.setPayment(payment);
@@ -76,7 +127,7 @@ public class BookingService {
         Booking saveBooking=bookingRepository.save(booking);
 
         SelectedSeat.forEach(seat -> {
-            seat.setStatus("Booked");
+            seat.setStatus("BOOKED");
             seat.setBooking(saveBooking);
         });
 
@@ -84,7 +135,7 @@ public class BookingService {
         return mapToBookingDto(saveBooking,SelectedSeat);
     }
 
-    public BookingDto getBookingById(Integer id)
+    public BookingDto getBookingById(Long id)
     {
         Booking booking=bookingRepository.findById(id)
         .orElseThrow(()->new ResourceNotFoundException("Booking not found"));
@@ -119,7 +170,7 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
     @Transactional
-    public BookingDto cancelBooking(Integer id)
+    public BookingDto cancelBooking(Long id)
     {
         Booking booking=bookingRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Booking not found"));
@@ -230,3 +281,4 @@ public class BookingService {
         return bookingDto;
     }
 }
+

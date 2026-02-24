@@ -25,6 +25,9 @@ public class Seat {
     @Column(nullable = false)
     private Integer basePrice;
 
+   // @ManyToOne
+    //@JoinColumn(name="show_id", nullable=false)
+    //private  Show show;
     @ManyToOne
     @JoinColumn(name="screen_id", nullable=false)
     private Screen screen;

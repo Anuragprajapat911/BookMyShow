@@ -60,7 +60,7 @@ public class MovieService {
             Movie movie=movieRepository.findById(id)
                     .orElseThrow(()->new ResourceNotFoundException("Movie not found by id"+id));
             movie.setTitle(movieDto.getTitle());
-            movie.setId(movieDto.getId());
+            movie.setDescription(movieDto.getDescription());
             movie.setLanguage(movieDto.getLanguage());
             movie.setReleaseDate(movieDto.getReleaseDate());
             movie.setPosterUrl(movieDto.getPosterUrl());
@@ -99,7 +99,7 @@ public class MovieService {
 
         Movie movie=new Movie();
         movie.setTitle(movieDto.getTitle());
-        movie.setId(movieDto.getId());
+        movie.setDescription(movieDto.getDescription());
         movie.setLanguage(movieDto.getLanguage());
         movie.setReleaseDate(movieDto.getReleaseDate());
         movie.setPosterUrl(movieDto.getPosterUrl());

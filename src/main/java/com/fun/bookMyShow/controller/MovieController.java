@@ -51,7 +51,7 @@ public class MovieController {
 
 
     }
-    @GetMapping("/title{title}")
+    @GetMapping("/title/{title}")
     public ResponseEntity<List<MovieDto>> searchMovieByTitle(@PathVariable String title){
 
 

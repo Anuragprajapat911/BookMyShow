@@ -45,6 +45,8 @@ public class UserService {
                 .orElseThrow(()->new ResourceNotFoundException("User nahi mila he Id se bhai"));
         userRepository.delete(user);
    }
+
+
     public UserDto updateUserById(Long id, UserDto userDto){
 
        User user= userRepository.findById(id)

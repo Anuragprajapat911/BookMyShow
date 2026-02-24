@@ -24,12 +24,12 @@ public class BookingController
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookingDto> getBookingById(@PathVariable Integer id)
+    public ResponseEntity<BookingDto> getBookingById(@PathVariable Long id)
     {
         return ResponseEntity.ok(bookingService.getBookingById(id));
     }
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<BookingDto> cancelBooking(@PathVariable Integer id) {
+    public ResponseEntity<BookingDto> cancelBooking(@PathVariable Long id) {
 
         BookingDto bookingDto = bookingService.cancelBooking(id);
         return ResponseEntity.ok(bookingDto);

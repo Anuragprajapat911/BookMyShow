@@ -31,9 +31,9 @@ public class User {
     @Column(nullable = false)
     private String phoneNumber;
 
-   @Enumerated(EnumType.STRING)
+   @Convert(converter = UserRoleConverter.class)
    @Column(nullable = false)
-   private Role role= Role.USER;
+   private Role role = Role.USER;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Booking>  bookings;
