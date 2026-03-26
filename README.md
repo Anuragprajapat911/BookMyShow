@@ -18,10 +18,8 @@ ORM: JPA (Hibernate)
 Build Tool: Maven
 Version Control: Git
 ⚙️ Setup Instructions
-1. Clone the Repository
-git clone https://github.com/your-username/bookmyshow-backend.git
-cd bookmyshow-backend
-2. Configure Database
+
+ Configure Database
 
 Update your application.properties:
 
