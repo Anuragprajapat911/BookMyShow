@@ -1,7 +1,6 @@
 package com.fun.bookMyShow.controller;
 
 
-import com.fun.bookMyShow.DTO.JwtResponse;
 import com.fun.bookMyShow.DTO.LoginRequest;
 
 import com.fun.bookMyShow.DTO.RegisterRequest;
