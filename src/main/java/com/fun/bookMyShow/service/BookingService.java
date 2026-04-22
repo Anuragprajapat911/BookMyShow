@@ -124,9 +124,11 @@ public class BookingService {
         booking.setBookingNumber(UUID.randomUUID().toString());
         booking.setPayment(payment);
 
+
         Booking saveBooking=bookingRepository.save(booking);
 
         SelectedSeat.forEach(seat -> {
+
             seat.setStatus("BOOKED");
             seat.setBooking(saveBooking);
         });
