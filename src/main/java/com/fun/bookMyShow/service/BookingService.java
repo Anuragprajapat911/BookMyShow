@@ -33,6 +33,9 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
     public BookingDto createBooking(BookingRequestDto bookingRequest)
     {
@@ -134,6 +137,7 @@ public class BookingService {
         });
 
         seatRepository.saveAll(SelectedSeat);
+        emailService.sendBookingConfirmation(saveBooking, SelectedSeat);
         return mapToBookingDto(saveBooking,SelectedSeat);
     }
 
@@ -193,6 +197,7 @@ public class BookingService {
           }
           Booking updateBooking=bookingRepository.save(booking);
           seatRepository.saveAll(seats);
+          emailService.sendBookingCancellation(updateBooking, seats);
           return mapToBookingDto(booking,seats);
     }
 

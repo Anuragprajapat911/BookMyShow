@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -30,6 +31,15 @@ public class User {
 
     @Column(nullable = false)
     private String phoneNumber;
+
+    @Column(name = "reset_password_token", length = 128)
+    private String resetPasswordToken;
+
+    @Column(name = "reset_password_expiry")
+    private LocalDateTime resetPasswordExpiry;
+
+    @Column(name = "reset_password_used_at")
+    private LocalDateTime resetPasswordUsedAt;
 
    @Convert(converter = UserRoleConverter.class)
    @Column(nullable = false)
