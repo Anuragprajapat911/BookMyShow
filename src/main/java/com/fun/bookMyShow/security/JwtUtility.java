@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,14 +19,14 @@ import java.util.function.Function;
 @Component
 public class JwtUtility {
 
-    @Value("${jwt.secret:bookmyshow_secret_key_bookmyshow_secret_key}")
+    @Value("${jwt.secret:bookmyshow_jwt_secret_key_256_bits_minimum_for_hs256_secure_token_signing}")
     private String SECRET;
 
     @Value("${jwt.expiration:86400000}")
     private long EXPIRATION_TIME;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String username) {
