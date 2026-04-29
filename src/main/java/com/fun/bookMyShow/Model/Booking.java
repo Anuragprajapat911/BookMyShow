@@ -9,7 +9,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name="bookings")
+@Table(
+        name="bookings",
+        indexes = {
+                @Index(name = "idx_booking_user_id", columnList = "user_id"),
+                @Index(name = "idx_booking_show_id", columnList = "show_id"),
+                @Index(name = "idx_booking_booking_number", columnList = "booking_number")
+        }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

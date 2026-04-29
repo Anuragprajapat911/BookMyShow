@@ -8,7 +8,12 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table(name="theaters")
+@Table(
+        name="theaters",
+        indexes = {
+                @Index(name = "idx_theater_city", columnList = "city")
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

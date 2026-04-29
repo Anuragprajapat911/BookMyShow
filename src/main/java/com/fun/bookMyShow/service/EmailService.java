@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -31,6 +32,7 @@ public class EmailService {
     @Value("${mailing.from:${spring.mail.username:no-reply@bookmyshow.local}}")
     private String fromAddress;
 
+    @Async
     public void sendWelcomeMail(User user) {
         if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
             return;
@@ -44,6 +46,7 @@ public class EmailService {
         sendMail(user.getEmail(), subject, body);
     }
 
+    @Async
     public void sendPasswordResetMail(User user, String resetUrl) {
         if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
             return;
@@ -59,6 +62,7 @@ public class EmailService {
         sendMail(user.getEmail(), subject, body);
     }
 
+    @Async
     public void sendBookingConfirmation(Booking booking, List<ShowSeat> seats) {
         if (booking == null || booking.getUser() == null) {
             return;
@@ -83,6 +87,7 @@ public class EmailService {
         sendMail(to, subject, body);
     }
 
+    @Async
     public void sendBookingCancellation(Booking booking, List<ShowSeat> seats) {
         if (booking == null || booking.getUser() == null) {
             return;
